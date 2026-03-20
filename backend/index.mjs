@@ -11,6 +11,10 @@ import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedroc
 * you ever need to change the table name or swap Claude models, you change it in one place instead
 * of hunting through the whole file.
 *
+*  ⚠️ If this model is deprecated, replace with any active Anthropic model ID from:
+*  https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html
+* const MODEL = "us.anthropic.claude-3-5-haiku-20241022-v1:0";
+*
 * */
 const dynamo = DynamoDBDocumentClient.from(new DynamoDBClient({ region: "us-east-1" }));
 const bedrock = new BedrockRuntimeClient({ region: "us-east-1" });

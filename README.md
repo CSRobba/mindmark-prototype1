@@ -262,6 +262,7 @@ Then load the extension in Chrome following the steps in the Try It section abov
 | Cold starts | Lambda functions that haven't been invoked recently take 1–3 seconds to wake up on the first call. Subsequent calls are fast. |
 | Chrome only | Uses Manifest V3 and Chrome-specific APIs. Not tested on Firefox or other browsers. |
 | Search quality scales with volume | Semantic search is more impressive and useful with a larger, more diverse bookmark collection. |
+| Claude model deprecation | Uses `us.anthropic.claude-3-5-haiku-20241022-v1:0`. If deprecated, update the `MODEL` constant on line 4 of `backend/index.mjs` to any active model ID from [AWS Bedrock model IDs](https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html) and redeploy. |
 
 ---
 
