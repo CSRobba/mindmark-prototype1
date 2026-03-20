@@ -18,44 +18,59 @@
         <p class="tagline">Your AI bookmark brain</p>
     </div>
 
-    <!-- Save Section -->
-    <div class="section">
-        <div class="current-page" id="currentPage">
-            <span class="page-title" id="pageTitle">Loading current page...</span>
-            <span class="page-url" id="pageUrl"></span>
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab active" data-tab="save">Save</button>
+        <button class="tab" data-tab="bookmarks">Bookmarks</button>
+    </div>
+
+    <!-- Save Tab -->
+    <div id="tab-save" class="tab-content active">
+
+        <!-- Current page info -->
+        <div class="current-page">
+            <span class="page-url" id="pageUrl">Loading...</span>
         </div>
+
+        <!-- Editable title -->
+        <input
+                type="text"
+                id="titleInput"
+                class="title-input"
+                placeholder="Page title..."
+        />
+
+        <!-- Note -->
         <textarea
                 id="noteInput"
                 class="note-input"
                 placeholder="Add a note (optional)..."
                 rows="2"
         ></textarea>
+
         <button id="saveBtn" class="btn btn-primary">
             🔖 Save This Page
         </button>
         <div id="saveStatus" class="status-msg"></div>
-    </div>
 
-    <div class="divider"></div>
+        <div class="divider"></div>
 
-    <!-- Search Section -->
-    <div class="section">
+        <!-- Search -->
         <div class="search-wrapper">
             <input
                     type="text"
                     id="searchInput"
                     class="search-input"
-                    placeholder="Search your bookmarks..."
+                    placeholder="Search your bookmarks with AI..."
             />
-            <button id="searchBtn" class="btn btn-search">Search</button>
+            <button id="searchBtn" class="btn-search">Search</button>
         </div>
         <div id="searchResults" class="results-container"></div>
+
     </div>
 
-    <div class="divider"></div>
-
-    <!-- Bookmarks List -->
-    <div class="section">
+    <!-- Bookmarks Tab -->
+    <div id="tab-bookmarks" class="tab-content">
         <div class="section-header">
             <span class="section-title">Saved Bookmarks</span>
             <button id="refreshBtn" class="btn-icon">↻</button>

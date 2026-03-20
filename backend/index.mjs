@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, QueryCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 
 // ── Clients ──────────────────────────────────────────────────────────────────
@@ -65,6 +65,8 @@ export const handler = async (event) => {
             return await searchBookmarks(body, headers);
         } else if (action === "list") {
             return await listBookmarks(body, headers);
+        } else if (action === "delete") {
+            return await deleteBookmark(body, headers);
         } else {
             return {
                 statusCode: 400,
@@ -214,5 +216,30 @@ Only return the JSON array, no other text.`;
         statusCode: 200,
         headers,
         body: JSON.stringify({ results, query }),
+    };
+}
+// ── Delete Bookmark ───────────────────────────────────────────────────────────
+// Removes a bookmark from DynamoDB by userId + id
+async function deleteBookmark({ id, userId = "demo-user" }, headers) {
+    if (!id) {
+        return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: "id is required" }),
+        };
+    }
+
+    await dynamo.send(new DeleteCommand({
+        TableName: TABLE,
+        Key: {
+            userId,
+            id,
+        },
+    }));
+
+    return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ success: true, deleted: id }),
     };
 }
