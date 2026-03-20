@@ -1,0 +1,5 @@
+node_modules/
+function.zip
+response.json
+output.json
+.env
