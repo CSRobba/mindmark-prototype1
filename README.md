@@ -1,4 +1,4 @@
-# 🔖 MindMark
+# MindMark
 
 **AI-powered resource manager with semantic natural language retrieval**
 
