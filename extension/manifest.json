@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "MindMark",
+  "version": "1.0",
+  "description": "AI-powered bookmark manager with semantic search",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "MindMark"
+  }
+}

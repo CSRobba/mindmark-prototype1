@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>MindMark</title>
+    <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <span class="logo-icon">🔖</span>
+            <span class="logo-text">MindMark</span>
+        </div>
+        <p class="tagline">Your AI bookmark brain</p>
+    </div>
+
+    <!-- Save Section -->
+    <div class="section">
+        <div class="current-page" id="currentPage">
+            <span class="page-title" id="pageTitle">Loading current page...</span>
+            <span class="page-url" id="pageUrl"></span>
+        </div>
+        <textarea
+                id="noteInput"
+                class="note-input"
+                placeholder="Add a note (optional)..."
+                rows="2"
+        ></textarea>
+        <button id="saveBtn" class="btn btn-primary">
+            🔖 Save This Page
+        </button>
+        <div id="saveStatus" class="status-msg"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Search Section -->
+    <div class="section">
+        <div class="search-wrapper">
+            <input
+                    type="text"
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="Search your bookmarks..."
+            />
+            <button id="searchBtn" class="btn btn-search">Search</button>
+        </div>
+        <div id="searchResults" class="results-container"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Bookmarks List -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">Saved Bookmarks</span>
+            <button id="refreshBtn" class="btn-icon">↻</button>
+        </div>
+        <div id="bookmarksList" class="bookmarks-list">
+            <p class="empty-msg">Loading bookmarks...</p>
+        </div>
+    </div>
+
+</div>
+<script src="popup.js"></script>
+</body>
+</html>
