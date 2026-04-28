@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>MindMark</title>
-    <link rel="stylesheet" href="popup.css" />
+    <link rel="stylesheet" href="popup.css"/>
 </head>
 <body>
 <div class="container">
@@ -15,69 +15,89 @@
             <span class="logo-icon">🔖</span>
             <span class="logo-text">MindMark</span>
         </div>
-        <p class="tagline">Your AI bookmark brain</p>
+        <p class="tagline">A digital extension to your knowledge base</p>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-        <button class="tab active" data-tab="save">Save</button>
-        <button class="tab" data-tab="bookmarks">Bookmarks</button>
-    </div>
+    <!-- Main UI (hidden until auth in Phase 6) -->
+    <div id="mainUI">
 
-    <!-- Save Tab -->
-    <div id="tab-save" class="tab-content active">
-
-        <!-- Current page info -->
-        <div class="current-page">
-            <span class="page-url" id="pageUrl">Loading...</span>
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="save">Save</button>
+            <button class="tab" data-tab="bookmarks">Library</button>
         </div>
 
-        <!-- Editable title -->
-        <input
+        <!-- Save Tab -->
+        <div id="tab-save" class="tab-content active">
+
+            <div class="current-page">
+                <span class="page-url" id="pageUrl">Loading...</span>
+            </div>
+
+            <input
                 type="text"
                 id="titleInput"
                 class="title-input"
                 placeholder="Page title..."
-        />
+            />
 
-        <!-- Note -->
-        <textarea
+            <textarea
                 id="noteInput"
                 class="note-input"
                 placeholder="Add a note (optional)..."
                 rows="2"
-        ></textarea>
+            ></textarea>
 
-        <button id="saveBtn" class="btn btn-primary">
-            🔖 Save This Page
-        </button>
-        <div id="saveStatus" class="status-msg"></div>
+            <button id="saveBtn" class="btn btn-primary">
+                Save This Page
+            </button>
+            <div id="saveStatus" class="status-msg"></div>
 
-        <div class="divider"></div>
+            <div class="divider"></div>
 
-        <!-- Search -->
-        <div class="search-wrapper">
-            <input
+            <div class="search-wrapper">
+                <input
                     type="text"
                     id="searchInput"
                     class="search-input"
-                    placeholder="Search your bookmarks with AI..."
-            />
-            <button id="searchBtn" class="btn-search">Search</button>
+                    placeholder="Search your library..."
+                />
+                <button id="searchBtn" class="btn-search">Search</button>
+            </div>
+            <div id="searchResults" class="results-container"></div>
+
         </div>
-        <div id="searchResults" class="results-container"></div>
+
+        <!-- Library Tab -->
+        <div id="tab-bookmarks" class="tab-content">
+            <div class="section-header">
+                <span class="section-title">Your Library</span>
+                <button id="refreshBtn" class="btn-icon">↻</button>
+            </div>
+
+            <!-- Tag filter bar — populated dynamically -->
+            <div id="tagFilterBar" class="tag-filter-bar hidden"></div>
+
+            <div id="bookmarksList" class="bookmarks-list">
+                <p class="empty-msg">Loading...</p>
+            </div>
+        </div>
 
     </div>
 
-    <!-- Bookmarks Tab -->
-    <div id="tab-bookmarks" class="tab-content">
-        <div class="section-header">
-            <span class="section-title">Saved Bookmarks</span>
-            <button id="refreshBtn" class="btn-icon">↻</button>
+    <!-- Auth screen — shown in Phase 6 -->
+    <div id="authScreen" class="auth-screen">
+        <p class="auth-title" id="authTitle">Sign in to MindMark</p>
+        <input type="email" id="authEmail" class="auth-input" placeholder="Email"/>
+        <input type="password" id="authPassword" class="auth-input" placeholder="Password"/>
+        <div id="authConfirmWrap" style="display:none">
+            <input type="text" id="authCode" class="auth-input" placeholder="Verification code"/>
         </div>
-        <div id="bookmarksList" class="bookmarks-list">
-            <p class="empty-msg">Loading bookmarks...</p>
-        </div>
+        <button id="authBtn" class="btn btn-primary">Sign In</button>
+        <p class="auth-status" id="authStatus"></p>
+        <p class="auth-switch" id="authSwitch">
+            No account? <span id="authSwitchLink">Sign up</span>
+        </p>
     </div>
 
 </div>

@@ -192,4 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("searchInput").addEventListener("keydown", (e) => {
         if (e.key === "Enter") searchBookmarks();
     });
+
+    // Auth screen hidden for now — Phase 6 wires this up
+    document.getElementById("authScreen").style.display = "none";
+    document.getElementById("mainUI").style.display = "block";
 });

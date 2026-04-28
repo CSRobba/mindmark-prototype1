@@ -5,22 +5,26 @@
 }
 
 body {
-    width: 380px;
-    min-height: 480px;
+    width: 400px;
+    min-height: 500px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 13px;
-    background: #0f0f0f;
+    background: #0d0d0d;
     color: #e8e8e8;
+    border-radius: 16px;
+    overflow: hidden;
 }
 
 .container {
-    padding: 16px;
+    padding: 18px 16px;
 }
 
-/* Header */
+/* ── Header ────────────────────────────────────────────────── */
 .header {
     text-align: center;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #1e1e1e;
 }
 
 .logo {
@@ -28,57 +32,63 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
-.logo-icon { font-size: 20px; }
+.logo-icon {
+    font-size: 18px;
+}
 
 .logo-text {
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #4f8ef7, #1a6fd6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .tagline {
     font-size: 11px;
-    color: #555;
+    color: #444;
+    letter-spacing: 0.2px;
 }
 
-/* Tabs */
+/* ── Tabs ──────────────────────────────────────────────────── */
 .tabs {
     display: flex;
     gap: 4px;
-    background: #1a1a1a;
+    background: #161616;
     border-radius: 10px;
-    padding: 4px;
+    padding: 3px;
     margin-bottom: 14px;
+    border: 1px solid #1e1e1e;
 }
 
 .tab {
     flex: 1;
     padding: 7px;
     border: none;
-    border-radius: 7px;
+    border-radius: 8px;
     background: transparent;
-    color: #666;
+    color: #555;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
+    letter-spacing: 0.1px;
 }
 
 .tab.active {
-    background: #2a2a2a;
+    background: #242424;
     color: #e8e8e8;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
 
 .tab:hover:not(.active) {
-    color: #aaa;
+    color: #999;
 }
 
-/* Tab content */
+/* ── Tab content ───────────────────────────────────────────── */
 .tab-content {
     display: none;
 }
@@ -87,7 +97,7 @@ body {
     display: block;
 }
 
-/* Current page */
+/* ── Current page ──────────────────────────────────────────── */
 .current-page {
     margin-bottom: 8px;
 }
@@ -95,97 +105,107 @@ body {
 .page-url {
     display: block;
     font-size: 10px;
-    color: #555;
+    color: #3a3a3a;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Editable title */
+/* ── Inputs ────────────────────────────────────────────────── */
 .title-input {
     width: 100%;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
+    background: #161616;
+    border: 1px solid #222;
+    border-radius: 10px;
     padding: 9px 12px;
     color: #e8e8e8;
     font-size: 13px;
     font-weight: 500;
     font-family: inherit;
     margin-bottom: 8px;
+    transition: border-color 0.15s;
 }
 
 .title-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #2d5a9e;
 }
 
-/* Note input */
 .note-input {
     width: 100%;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
+    background: #161616;
+    border: 1px solid #222;
+    border-radius: 10px;
     padding: 8px 12px;
     color: #e8e8e8;
     font-size: 12px;
     resize: none;
     margin-bottom: 8px;
     font-family: inherit;
+    transition: border-color 0.15s;
+    line-height: 1.4;
 }
 
 .note-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #2d5a9e;
 }
 
-/* Buttons */
+/* ── Buttons ───────────────────────────────────────────────── */
 .btn {
     width: 100%;
     padding: 9px 16px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity 0.15s, transform 0.1s;
+    letter-spacing: 0.1px;
 }
 
-.btn:hover { opacity: 0.85; }
+.btn:hover {
+    opacity: 0.88;
+}
+
+.btn:active {
+    transform: scale(0.99);
+}
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #4f8ef7, #1a6fd6);
     color: white;
 }
 
 .btn-primary:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+    transform: none;
 }
 
 .btn-icon {
     background: none;
     border: none;
-    color: #666;
-    font-size: 16px;
+    color: #444;
+    font-size: 15px;
     cursor: pointer;
     padding: 2px 6px;
-    border-radius: 4px;
+    border-radius: 6px;
+    transition: color 0.15s;
 }
 
 .btn-icon:hover {
-    color: #e8e8e8;
-    background: #1a1a1a;
+    color: #aaa;
 }
 
-/* Divider */
+/* ── Divider ───────────────────────────────────────────────── */
 .divider {
     height: 1px;
-    background: #1e1e1e;
+    background: #1a1a1a;
     margin: 12px 0;
 }
 
-/* Search */
+/* ── Search ────────────────────────────────────────────────── */
 .search-wrapper {
     display: flex;
     gap: 8px;
@@ -194,81 +214,121 @@ body {
 
 .search-input {
     flex: 1;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
+    background: #161616;
+    border: 1px solid #222;
+    border-radius: 10px;
     padding: 8px 12px;
     color: #e8e8e8;
     font-size: 12px;
     font-family: inherit;
+    transition: border-color 0.15s;
 }
 
 .search-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #2d5a9e;
 }
 
 .btn-search {
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    color: #e8e8e8;
+    background: #161616;
+    border: 1px solid #222;
+    color: #aaa;
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 12px;
     cursor: pointer;
     white-space: nowrap;
     font-family: inherit;
+    font-weight: 500;
+    transition: all 0.15s;
 }
 
 .btn-search:hover {
-    border-color: #667eea;
-    color: #667eea;
+    border-color: #4f8ef7;
+    color: #4f8ef7;
 }
 
-/* Search results */
+/* ── Search results ────────────────────────────────────────── */
 .results-container {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
 }
 
 .result-card {
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-left: 3px solid #667eea;
-    border-radius: 8px;
+    background: #161616;
+    border: 1px solid #1e1e1e;
+    border-left: 2px solid #4f8ef7;
+    border-radius: 10px;
     padding: 10px 12px;
+}
+
+.result-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
 }
 
 .result-title a {
     font-weight: 500;
-    color: #e8e8e8;
+    color: #e0e0e0;
     text-decoration: none;
+    font-size: 12.5px;
     display: block;
-    margin-bottom: 3px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 260px;
 }
 
-.result-title a:hover { color: #667eea; }
+.result-title a:hover {
+    color: #4f8ef7;
+}
+
+.result-score-label {
+    font-size: 10px;
+    color: #4f8ef7;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+ç
+.relevance-bar-wrap {
+    width: 100%;
+    height: 3px;
+    background: #222;
+    border-radius: 2px;
+    margin-bottom: 5px;
+    overflow: hidden;
+}
+
+.relevance-bar {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #4f8ef7, #1a6fd6);
+    transition: width 0.3s ease;
+}
 
 .result-reason {
     font-size: 11px;
-    color: #888;
-    margin-bottom: 4px;
+    color: #666;
     line-height: 1.4;
+    margin-bottom: 3px;
 }
 
 .result-url {
     font-size: 10px;
-    color: #555;
+    color: #333;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Bookmarks tab */
+/* ── Bookmarks tab ─────────────────────────────────────────── */
 .section-header {
     display: flex;
     align-items: center;
@@ -277,106 +337,264 @@ body {
 }
 
 .section-title {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #666;
+    letter-spacing: 0.6px;
+    color: #444;
 }
 
+/* ── Tag filter bar ────────────────────────────────────────── */
+.tag-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+    min-height: 0;
+}
+
+.tag-filter-bar.hidden {
+    display: none;
+}
+
+.tag-filter-pill {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #2a2a2a;
+    background: #161616;
+    color: #666;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.tag-filter-pill:hover {
+    border-color: #4f8ef7;
+    color: #4f8ef7;
+}
+
+.tag-filter-pill.active {
+    background: #4f8ef718;
+    border-color: #4f8ef7;
+    color: #4f8ef7;
+}
+
+.tag-filter-pill.all-pill {
+    color: #555;
+}
+
+.tag-filter-pill.all-pill.active {
+    background: #242424;
+    border-color: #444;
+    color: #e8e8e8;
+}
+
+/* ── Bookmark list ─────────────────────────────────────────── */
 .bookmarks-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    max-height: 340px;
+    gap: 5px;
+    max-height: 320px;
     overflow-y: auto;
 }
 
 .bookmark-card {
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
+    background: #161616;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
     padding: 10px 12px;
-    transition: border-color 0.2s;
+    transition: border-color 0.15s;
 }
 
-.bookmark-card:hover { border-color: #444; }
-
-.bookmark-title a {
-    font-weight: 500;
-    color: #e8e8e8;
-    text-decoration: none;
-    display: block;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.bookmark-card:hover {
+    border-color: #2e2e2e;
 }
 
-.bookmark-title a:hover { color: #667eea; }
-
-.bookmark-note {
-    font-size: 11px;
-    color: #666;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.bookmark-meta {
-    font-size: 10px;
-    color: #444;
-}
-
-/* Status */
-.status-msg {
-    font-size: 11px;
-    margin-top: 6px;
-    min-height: 16px;
-    text-align: center;
-}
-
-.status-success { color: #4ade80; }
-.status-error   { color: #f87171; }
-.status-loading { color: #667eea; }
-
-/* Empty state */
-.empty-msg {
-    color: #555;
-    font-size: 12px;
-    text-align: center;
-    padding: 16px 0;
-}
-
-/* Scrollbar */
-.bookmarks-list::-webkit-scrollbar { width: 4px; }
-.bookmarks-list::-webkit-scrollbar-track { background: #0f0f0f; }
-.bookmarks-list::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 2px;
-}
-
-/* Delete button */
 .bookmark-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 8px;
+    margin-bottom: 4px;
 }
 
+.bookmark-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.bookmark-title a {
+    font-weight: 500;
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 12.5px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bookmark-title a:hover {
+    color: #4f8ef7;
+}
+
+.bookmark-note {
+    font-size: 11px;
+    color: #555;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bookmark-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.bookmark-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.tag-pill {
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 500;
+    background: #0e1a2e;
+    color: #4f8ef7;
+    border: 1px solid #1a2a3e;
+    white-space: nowrap;
+}
+
+.bookmark-meta {
+    font-size: 10px;
+    color: #333;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Delete button ─────────────────────────────────────────── */
 .btn-delete {
     background: none;
     border: none;
-    color: #444;
-    font-size: 14px;
+    color: #333;
+    font-size: 13px;
     cursor: pointer;
     padding: 0 2px;
     line-height: 1;
     flex-shrink: 0;
-    transition: color 0.2s;
+    transition: color 0.15s;
 }
 
 .btn-delete:hover {
     color: #f87171;
 }
+
+/* ── Status messages ───────────────────────────────────────── */
+.status-msg {
+    font-size: 11px;
+    margin-top: 6px;
+    min-height: 16px;
+    text-align: center;
+    letter-spacing: 0.1px;
+}
+
+.status-success { color: #4ade80; }
+.status-error   { color: #f87171; }
+.status-loading { color: #4f8ef7; }
+
+/* ── Empty state ───────────────────────────────────────────── */
+.empty-msg {
+    color: #3a3a3a;
+    font-size: 12px;
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* ── Scrollbars ────────────────────────────────────────────── */
+.bookmarks-list::-webkit-scrollbar,
+.results-container::-webkit-scrollbar {
+    width: 3px;
+}
+
+.bookmarks-list::-webkit-scrollbar-track,
+.results-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.bookmarks-list::-webkit-scrollbar-thumb,
+.results-container::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 2px;
+}
+
+/* ── Auth screen ───────────────────────────────────────────── */
+.auth-screen {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.auth-screen.active {
+    display: flex;
+}
+
+.auth-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #aaa;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.auth-input {
+    width: 100%;
+    background: #161616;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 9px 12px;
+    color: #e8e8e8;
+    font-size: 13px;
+    font-family: inherit;
+    transition: border-color 0.15s;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: #2d5a9e;
+}
+
+.auth-switch {
+    font-size: 11px;
+    color: #555;
+    text-align: center;
+    cursor: pointer;
+}
+
+.auth-switch span {
+    color: #4f8ef7;
+    cursor: pointer;
+}
+
+.auth-switch span:hover {
+    text-decoration: underline;
+}
+
+.auth-status {
+    font-size: 11px;
+    text-align: center;
+    min-height: 16px;
+}
+
+.auth-error { color: #f87171; }
+.auth-success { color: #4ade80; }
+.auth-loading { color: #4f8ef7; }
