@@ -12,7 +12,6 @@
     <!-- Header -->
     <div class="header">
         <div class="logo">
-            <span class="logo-icon">🔖</span>
             <span class="logo-text">MindMark</span>
         </div>
         <p class="tagline">A digital extension to your knowledge base</p>
@@ -61,8 +60,14 @@
                     id="searchInput"
                     class="search-input"
                     placeholder="Search your library..."
+                    autocomplete="off"
                 />
                 <button id="searchBtn" class="btn-search">Search</button>
+            </div>
+            <div id="searchClearWrap" style="display:none; text-align:right; margin-bottom:4px;">
+                <button id="clearSearchBtn" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;padding:0;">
+                    Clear results
+                </button>
             </div>
             <div id="searchResults" class="results-container"></div>
 
