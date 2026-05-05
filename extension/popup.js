@@ -47,7 +47,7 @@ function buildResultCard(r) {
         <div class="result-card">
             <div class="result-header">
                 <div class="result-title">
-                    <a href="${r.url}" target="_blank">${r.title}</a>
+                    <a href="${r.url}" target="_blank" title="${r.title}">${r.title}</a>
                 </div>
                 ${score !== null
                     ? `<span class="result-score-label">${score}%</span>`
