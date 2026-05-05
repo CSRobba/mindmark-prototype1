@@ -2,67 +2,52 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand, QueryCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 
-// ── Clients ──────────────────────────────────────────────────────────────────
-// These are reused across invocations — Lambda keeps them warm between calls
-/*
-* These lines create the connections to DynamoDB and Bedrock once when Lambda first starts up.
-* Lambda keeps these "warm" between calls so you're not reconnecting on every single request —
-* this is a performance best practice. TABLE and MODEL are constants defined at the top so if
-* you ever need to change the table name or swap Claude models, you change it in one place instead
-* of hunting through the whole file.
-*
-*  ⚠️ If this model is deprecated, replace with any active Anthropic model ID from:
-*  https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html
-* const MODEL = "us.anthropic.claude-3-5-haiku-20241022-v1:0";
-*
-* */
-const dynamo = DynamoDBDocumentClient.from(new DynamoDBClient({ region: "us-east-1" }));
+// ============================================================
+// MindMark — index.mjs (Lambda function)
+// Handles: save, list, search, delete
+// Deployed to AWS Lambda, triggered via API Gateway
+// ============================================================
+
+// ── AWS Clients ───────────────────────────────────────────────
+// Created once when Lambda starts — reused across warm invocations
+// for performance. Avoids reconnecting on every request.
+const dynamo  = DynamoDBDocumentClient.from(new DynamoDBClient({ region: "us-east-1" }));
 const bedrock = new BedrockRuntimeClient({ region: "us-east-1" });
 
 const TABLE = "mindmark-bookmarks";
+
+// ⚠️ If this model is deprecated, replace with any active Anthropic
+// model ID from: https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html
 const MODEL = "us.anthropic.claude-3-5-haiku-20241022-v1:0";
 
-// ── Main Handler ─────────────────────────────────────────────────────────────
-// This is the entry point — Lambda calls this function for every request
-/*
-*
-* This is the entry point — the function AWS calls when your extension hits the API. The
-* name handler matches what you'll tell Lambda when deploying (index.handler = "in the file
-* index, call the function named handler").
-*
-* event is the entire incoming request — it contains the HTTP method, headers, and crucially
-* the body which is the JSON your extension sends.
-*
-* */
+// ── Main Handler ──────────────────────────────────────────────
+// Entry point — AWS calls this function for every incoming request.
+// Routes to the correct action based on the "action" field in the body.
+// index.handler in the Lambda config means: file=index, function=handler
 export const handler = async (event) => {
     console.log("Incoming event:", JSON.stringify(event));
 
-    // CORS headers — required so the Chrome extension can call this API
-    /*
-    * Browsers have a security rule called CORS (Cross-Origin Resource Sharing) that
-    * blocks JavaScript from calling APIs on different domains unless the API explicitly
-    * says "I allow this." The * in Allow-Origin means "any domain can call me" — fine for
-    * a prototype.
-    * */
+    // CORS headers — required so the Chrome extension (a different origin)
+    // is allowed to call this API. * means any domain can call — fine for prototype.
     const headers = {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin":  "*",
         "Access-Control-Allow-Headers": "Content-Type",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Content-Type": "application/json",
+        "Content-Type":                 "application/json",
     };
 
-    // Handle preflight CORS check that browsers send before every POST
+    // Browsers send a preflight OPTIONS request before every POST
+    // to confirm the server allows cross-origin calls. Return 200 immediately.
     if (event.httpMethod === "OPTIONS") {
         return { statusCode: 200, headers, body: "" };
     }
-/*
-* Parse the JSON the extension sent. Extract action — this is the routing key.
-* The extension tells Lambda what to do by setting action to "save", "search", or "list".
-* */
+
     try {
-        const body = JSON.parse(event.body || "{}");
+        const body     = JSON.parse(event.body || "{}");
         const { action } = body;
 
+        // Route to the correct handler based on the action field.
+        // The extension sets action = "save" | "search" | "list" | "delete"
         if (action === "save") {
             return await saveBookmark(body, headers);
         } else if (action === "search") {
@@ -75,7 +60,7 @@ export const handler = async (event) => {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ error: "Unknown action. Use: save, search, or list" }),
+                body: JSON.stringify({ error: "Unknown action. Use: save, search, list, or delete" }),
             };
         }
     } catch (err) {
@@ -88,14 +73,10 @@ export const handler = async (event) => {
     }
 };
 
-// ── Save Bookmark ─────────────────────────────────────────────────────────────
-// Writes a new bookmark item to DynamoDB
-/*
-* Builds the object to store. userId is hardcoded as "demo-user" for the prototype —
-* in real product this would come from user authentication. Date.now() generates a
-* unique timestamp-based ID like bm-1711234567890. toISOString() gives a clean timestamp
-* like 2026-03-19T10:30:00Z.
-* */
+// ── Save Bookmark ─────────────────────────────────────────────
+// Writes a new bookmark item to DynamoDB.
+// userId is hardcoded as "demo-user" — replaced with real auth in Phase 6.
+// id is a timestamp-based unique string like "bm-1711234567890".
 async function saveBookmark({ url, title, note = "" }, headers) {
     if (!url || !title) {
         return {
@@ -105,17 +86,18 @@ async function saveBookmark({ url, title, note = "" }, headers) {
         };
     }
 
-    // Build the item we'll store in DynamoDB
     const item = {
-        userId: "demo-user",           // Fixed for prototype — in production this would be auth'd
-        id: `bm-${Date.now()}`,        // Unique ID based on timestamp
+        userId:  "demo-user",
+        id:      `bm-${Date.now()}`,
         url,
         title,
         note,
         savedAt: new Date().toISOString(),
     };
 
-    // PutCommand = INSERT in SQL terms
+    // PutCommand = INSERT — writes the item to DynamoDB.
+    // If an item with the same userId + id already exists it is overwritten,
+    // but since id is timestamp-based that won't happen in practice.
     await dynamo.send(new PutCommand({ TableName: TABLE, Item: item }));
 
     return {
@@ -125,13 +107,14 @@ async function saveBookmark({ url, title, note = "" }, headers) {
     };
 }
 
-// ── List Bookmarks ────────────────────────────────────────────────────────────
-// Fetches all bookmarks for the demo user from DynamoDB
+// ── List Bookmarks ────────────────────────────────────────────
+// Fetches all bookmarks for the current user from DynamoDB.
+// QueryCommand scans only the user's partition (userId = "demo-user")
+// rather than the whole table — efficient regardless of total table size.
 async function listBookmarks(_, headers) {
-    // QueryCommand fetches all items with a matching partition key (userId)
     const result = await dynamo.send(new QueryCommand({
-        TableName: TABLE,
-        KeyConditionExpression: "userId = :uid",
+        TableName:                 TABLE,
+        KeyConditionExpression:    "userId = :uid",
         ExpressionAttributeValues: { ":uid": "demo-user" },
     }));
 
@@ -142,8 +125,13 @@ async function listBookmarks(_, headers) {
     };
 }
 
-// ── Search Bookmarks ──────────────────────────────────────────────────────────
-// This is the AI part — sends bookmarks + query to Claude, returns ranked results
+// ── Search Bookmarks ──────────────────────────────────────────
+// The AI-powered search flow:
+//   1. Fetch all bookmarks from DynamoDB
+//   2. Pre-filter to top 30 candidates using keyword matching
+//      (keeps Claude's context small as the library grows)
+//   3. Send candidates + query to Claude via Bedrock
+//   4. Claude returns up to 10 ranked results with relevance scores
 async function searchBookmarks({ query, userId = "demo-user" }, headers) {
     if (!query) {
         return {
@@ -153,10 +141,10 @@ async function searchBookmarks({ query, userId = "demo-user" }, headers) {
         };
     }
 
-    // Step 1: Fetch all bookmarks from DynamoDB
+    // Step 1: Fetch all bookmarks for this user from DynamoDB
     const result = await dynamo.send(new QueryCommand({
-        TableName: TABLE,
-        KeyConditionExpression: "userId = :uid",
+        TableName:                 TABLE,
+        KeyConditionExpression:    "userId = :uid",
         ExpressionAttributeValues: { ":uid": userId },
     }));
 
@@ -170,12 +158,32 @@ async function searchBookmarks({ query, userId = "demo-user" }, headers) {
         };
     }
 
-    // Step 2: Format bookmarks for Claude to read
-    const bookmarkList = bookmarks
-        .map((b, i) => `[${i + 1}] Title: "${b.title}" | URL: ${b.url} | Note: "${b.note || "none"}"`)
+    // Step 2: Pre-filter — keyword match to reduce candidate pool.
+    // Without this, a library of 200+ bookmarks would fill Claude's context
+    // window, causing slow responses and higher costs.
+    // We score each bookmark by how many query words appear in its
+    // title, URL, or note, then keep the top 30 candidates.
+    const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+
+    const candidatePool = bookmarks
+        .map(b => {
+            const haystack = `${b.title} ${b.url} ${b.note || ""}`.toLowerCase();
+            const hits     = queryWords.filter(w => haystack.includes(w)).length;
+            return { ...b, _hits: hits };
+        })
+        .sort((a, b) => b._hits - a._hits)
+        .slice(0, 30);
+
+    // Step 3: Format the candidate pool for Claude to read
+    const bookmarkList = candidatePool
+        .map((b, i) =>
+            `[${i + 1}] Title: "${b.title}" | URL: ${b.url} | Note: "${b.note || "none"}" | Saved: ${b.savedAt || "unknown"}`
+        )
         .join("\n");
 
-    // Step 3: Build the prompt — this is what we send to Claude
+    // Step 4: Build the prompt.
+    // We ask Claude for up to 10 results with a 0-100 relevance score each.
+    // Explicit JSON field names prevent Claude from returning inconsistent formats.
     const prompt = `You are a semantic bookmark search assistant.
 
 The user has these saved bookmarks:
@@ -183,36 +191,52 @@ ${bookmarkList}
 
 The user is searching for: "${query}"
 
-Return the most relevant bookmarks ranked by relevance. For each match return:
-- The bookmarked date
-- Title
-- URL  
-- A one-sentence reason why it matches
+Return up to 10 of the most relevant bookmarks ranked by relevance score.
+For each match return:
+- index: the bookmark number from the list above
+- title: the bookmark title
+- url: the bookmark URL
+- savedAt: the saved date
+- reason: ONE sentence explaining why it matches the query
+- score: a relevance score from 0 to 100 (100 = perfect match):
 
-If nothing is relevant, say so honestly. Return results as JSON array with fields: savedAt, title, url, reason.
-Only return the JSON array, no other text.`;
+Scoring rules:
+- 90 to 100 = exact or highly relevant match
+- 70 to 89 = strong relevance
+- 50 to 69 = somewhat relevant
+- below 50 = weak relevance
 
-    // Step 4: Call Claude via Bedrock
+Only include bookmarks that are genuinely relevant — do NOT pad to 10 if fewer are relevant.
+If nothing is relevant, return an empty array.
+Return ONLY a valid JSON array with fields: index, title, url, savedAt, reason, score.
+No markdown, no explanation, no code blocks — just the raw JSON array.`;
+
+    // Step 5: Call Claude via Bedrock
     const bedrockResponse = await bedrock.send(new InvokeModelCommand({
-        modelId: MODEL,
+        modelId:     MODEL,
         contentType: "application/json",
-        accept: "application/json",
+        accept:      "application/json",
         body: JSON.stringify({
             anthropic_version: "bedrock-2023-05-31",
-            max_tokens: 1024,
+            max_tokens:        1024,
             messages: [{ role: "user", content: prompt }],
         }),
     }));
 
-    // Step 5: Parse Claude's response
+    // Step 6: Parse Claude's response.
+    // Bedrock returns raw bytes — TextDecoder converts to string,
+    // then we parse the Bedrock wrapper and then Claude's inner JSON.
     const responseBody = JSON.parse(new TextDecoder().decode(bedrockResponse.body));
-    const claudeText = responseBody.content[0].text;
+    const claudeText   = responseBody.content[0].text;
 
     let results;
     try {
-        results = JSON.parse(claudeText);
+        // Strip any accidental markdown code fences Claude might add
+        const cleaned = claudeText.replace(/```json|```/g, "").trim();
+        results = JSON.parse(cleaned);
     } catch {
-        // If Claude didn't return clean JSON, return the raw text
+        // If Claude returns something unparseable, pass it through
+        // so the extension can show a graceful error
         results = claudeText;
     }
 
@@ -222,8 +246,10 @@ Only return the JSON array, no other text.`;
         body: JSON.stringify({ results, query }),
     };
 }
-// ── Delete Bookmark ───────────────────────────────────────────────────────────
-// Removes a bookmark from DynamoDB by userId + id
+
+// ── Delete Bookmark ───────────────────────────────────────────
+// Removes a single bookmark from DynamoDB by composite key (userId + id).
+// DynamoDB requires both parts of the key to locate and delete the item.
 async function deleteBookmark({ id, userId = "demo-user" }, headers) {
     if (!id) {
         return {
@@ -235,10 +261,7 @@ async function deleteBookmark({ id, userId = "demo-user" }, headers) {
 
     await dynamo.send(new DeleteCommand({
         TableName: TABLE,
-        Key: {
-            userId,
-            id,
-        },
+        Key: { userId, id },
     }));
 
     return {
