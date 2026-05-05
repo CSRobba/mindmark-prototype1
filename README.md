@@ -93,7 +93,7 @@ further user feedback.
 
 ---
 
-## Try It (Interview Demo)
+## Try It -- BETA demo
 
 > This section is for anyone who wants to see MindMark
 > running live against the deployed backend.
