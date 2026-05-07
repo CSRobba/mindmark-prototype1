@@ -364,14 +364,19 @@ body {
     color: #444;
 }
 
-/* ── Tag filter pills (above bookmark list) ────────────────── */
-/* Populated dynamically from tags on saved bookmarks */
+/* ── Tag filter bar — wraps into rows, max 3 visible, scrolls down ── */
 .tag-filter-bar {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
     margin-bottom: 10px;
-    min-height: 0;
+    max-height: 90px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.tag-filter-bar::-webkit-scrollbar {
+    display: none;
 }
 
 .tag-filter-bar.hidden {
@@ -397,9 +402,10 @@ body {
 }
 
 .tag-filter-pill.active {
-    background: #4f8ef718;
+    background: #4f8ef722;
     border-color: #4f8ef7;
     color: #4f8ef7;
+    font-weight: 600;
 }
 
 /* "All" pill has slightly different active style */

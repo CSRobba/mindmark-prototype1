@@ -138,12 +138,13 @@ async function loadBookmarks() {
     }
 }
 
-// Renders the tag filter pills above the bookmark list
-// "All" pill is always first, then one pill per unique tag
+// Renders the tag filter pills above the bookmark list.
+// Supports multi-select — clicking multiple tags shows bookmarks
+// matching ANY of the selected tags. Clicking All resets everything.
 function renderTagFilterBar(bookmarks) {
     const bar = document.getElementById("tagFilterBar");
 
-    // Collect all unique tags across all bookmarks
+    // Collect all unique tags across all bookmarks, sorted alphabetically
     const allTags = [...new Set(
         bookmarks.flatMap(b => b.tags || [])
     )].sort();
@@ -161,26 +162,47 @@ function renderTagFilterBar(bookmarks) {
         `).join("")}
     `;
 
-    // Wire up filter pill clicks
+    // Track which tags are currently selected
+    let selectedTags = new Set();
+
     bar.querySelectorAll(".tag-filter-pill").forEach(pill => {
         pill.addEventListener("click", () => {
-            bar.querySelectorAll(".tag-filter-pill").forEach(p => p.classList.remove("active"));
-            pill.classList.add("active");
+            const clickedTag = pill.dataset.tag;
 
-            const selectedTag = pill.dataset.tag;
-            const cards = document.querySelectorAll(".bookmark-card");
+            if (clickedTag === "all") {
+                // Reset — clear all selections and show every bookmark
+                selectedTags.clear();
+                bar.querySelectorAll(".tag-filter-pill").forEach(p => p.classList.remove("active"));
+                pill.classList.add("active");
+            } else {
+                // Deactivate the All pill since we're now filtering
+                bar.querySelector(".all-pill").classList.remove("active");
 
-            cards.forEach(card => {
-                if (selectedTag === "all") {
+                // Toggle this tag — click again to deselect
+                if (selectedTags.has(clickedTag)) {
+                    selectedTags.delete(clickedTag);
+                    pill.classList.remove("active");
+                } else {
+                    selectedTags.add(clickedTag);
+                    pill.classList.add("active");
+                }
+
+                // If user deselected everything, fall back to showing all
+                if (selectedTags.size === 0) {
+                    bar.querySelector(".all-pill").classList.add("active");
+                }
+            }
+
+            // Apply filter — show cards matching ANY selected tag
+            document.querySelectorAll(".bookmark-card").forEach(card => {
+                if (selectedTags.size === 0) {
                     card.style.display = "block";
                 } else {
-                    // Show card only if it has the selected tag
                     const cardTags = card.dataset.tags
-                        ? card.dataset.tags.split(",")
+                        ? card.dataset.tags.split(",").filter(Boolean)
                         : [];
-                    card.style.display = cardTags.includes(selectedTag)
-                        ? "block"
-                        : "none";
+                    const hasMatch = [...selectedTags].some(t => cardTags.includes(t));
+                    card.style.display = hasMatch ? "block" : "none";
                 }
             });
         });
