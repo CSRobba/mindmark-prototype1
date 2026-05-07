@@ -9,6 +9,18 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "MindMark"
+    "default_title": "MindMark",
+    "default_icon": {
+      "16": "MindMark_logo.png",
+      "32": "MindMark_logo.png",
+      "48": "MindMark_logo.png",
+      "128": "MindMark_logo.png"
+    }
+  },
+  "icons": {
+    "16": "MindMark_logo.png",
+    "32": "MindMark_logo.png",
+    "48": "MindMark_logo.png",
+    "128": "MindMark_logo.png"
   }
 }
