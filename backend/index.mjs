@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand, QueryCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, QueryCommand, DeleteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 
 // ============================================================
@@ -93,6 +93,7 @@ async function saveBookmark({ url, title, note = "" }, headers) {
         title,
         note,
         savedAt: new Date().toISOString(),
+        tags:    [],  // starts empty — filled async by generateAndStoreTags
     };
 
     // PutCommand = INSERT — writes the item to DynamoDB.
@@ -100,11 +101,72 @@ async function saveBookmark({ url, title, note = "" }, headers) {
     // but since id is timestamp-based that won't happen in practice.
     await dynamo.send(new PutCommand({ TableName: TABLE, Item: item }));
 
+    // Await tag generation — adds ~1-2 seconds to save time but ensures
+    // tags are stored before response returns. Lambda freezes execution
+    // on return so truly async background work gets killed before finishing.
+    try {
+        await generateAndStoreTags(item);
+    } catch (err) {
+        // Tag generation failing should never block a successful save
+        console.error("Tag generation failed:", err);
+    }
+
     return {
         statusCode: 200,
         headers,
         body: JSON.stringify({ success: true, bookmark: item }),
     };
+}
+
+// ── Generate and Store Tags ───────────────────────────────────
+// Called asynchronously after save — never blocks the save response.
+// Asks Claude to generate 1-3 short tags for the bookmark based on
+// its title and URL, then updates the DynamoDB item with those tags.
+async function generateAndStoreTags({ userId, id, title, url }) {
+    const prompt = `You are a bookmark tagging assistant.
+
+Given this bookmark:
+Title: "${title}"
+URL: "${url}"
+
+Generate 1 to 3 short, lowercase tags that best describe the topic or category.
+Tags should be generic enough to group related bookmarks together.
+Good examples: "machine-learning", "recipe", "javascript", "career", "research", "productivity"
+Bad examples: "interesting", "read-later", "link" (too vague)
+
+Return ONLY a JSON array of strings. No explanation, no markdown, no code blocks.
+Example: ["python", "tutorial"]`;
+
+    const bedrockResponse = await bedrock.send(new InvokeModelCommand({
+        modelId:     MODEL,
+        contentType: "application/json",
+        accept:      "application/json",
+        body: JSON.stringify({
+            anthropic_version: "bedrock-2023-05-31",
+            max_tokens:        100,
+            messages: [{ role: "user", content: prompt }],
+        }),
+    }));
+
+    const responseBody = JSON.parse(new TextDecoder().decode(bedrockResponse.body));
+    const claudeText   = responseBody.content[0].text;
+
+    // Strip any accidental markdown fences and parse the JSON array
+    const cleaned = claudeText.replace(/```json|```/g, "").trim();
+    const tags    = JSON.parse(cleaned);
+
+    if (!Array.isArray(tags)) return;
+
+    // Update the DynamoDB item with the generated tags.
+    // UpdateExpression = SET tags = :tags on the specific item.
+    await dynamo.send(new UpdateCommand({
+        TableName:                 TABLE,
+        Key:                       { userId, id },
+        UpdateExpression:          "SET tags = :tags",
+        ExpressionAttributeValues: { ":tags": tags },
+    }));
+
+    console.log(`Tags generated for ${id}:`, tags);
 }
 
 // ── List Bookmarks ────────────────────────────────────────────
